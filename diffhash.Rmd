@@ -54,7 +54,26 @@ writeXStringSet(small_fasta, 'chr22_small.fa')
 readspertx = round(20 * width(small_fasta) / 100)
 # simulation call:
 simulate_experiment('chr22_small.fa', reads_per_transcript=readspertx, 
-    num_reps=c(10,10), fold_changes=fold_changes, outdir='simulated_reads') 
+    num_reps=c(10,10), fold_changes=fold_changes, outdir='timecourse_reads') 
+
+#------------------------------------------------------------------------------------------------------
+
+# set up transcript-by-timepoint matrix:
+num_timepoints = 12
+countmat = matrix(readspertx, nrow=length(small_fasta), ncol=num_timepoints)
+
+# add spikes in expression at certain timepoints to certain transcripts:
+up_early = c(1,2) 
+up_late = c(3,4)
+countmat[up_early, 2] = 3*countmat[up_early, 2]
+countmat[up_early, 3] = round(1.5*countmat[up_early, 3])
+countmat[up_late, 10] = 6*countmat[up_late, 10]
+countmat[up_late, 11] = round(1.2*countmat[up_late, 11])
+
+# simulate reads:
+simulate_experiment_countmat('chr22_small.fa', readmat=countmat, 
+    outdir='timecourse_reads') 
+
 ```
 
 ## Process the reads
@@ -63,15 +82,20 @@ After simulating the reads, the julia code builds a dictionary of counts per fil
 
 ```{bash}
 if [ ! -f hashcounts.tsv ]; then
-  julia diffhash.jl
-  julia showhash.jl > hashcounts.tsv
+  julia --project=@. diffhash.jl
+  julia --project=@. showhash.jl > hashcounts.tsv
 fi
 ```
 
 ## Find kmers that are differentially expressed
 
+#```{r}
+#sim_rep_info <- read.delim("simulated_reads/sim_rep_info.txt")
+#hashcounts <- read.delim("hashcounts.tsv", header=FALSE, row.names=1)
+#```
+
 ```{r}
-sim_rep_info <- read.delim("simulated_reads/sim_rep_info.txt")
+sim_rep_info <- read.delim("timecourse_reads/sim_rep_info.txt")
 hashcounts <- read.delim("hashcounts.tsv", header=FALSE, row.names=1)
 ```
 
@@ -104,6 +128,6 @@ Writing out the kmers to a file will allow us to filter the reads to find reads 
 
 ```{r}
 diffkmers <- rownames(fit)[testresults != 0]
-write(diffkmers, "diffkmers.txt")
+write(diffkmers, "diffkmers1.txt")
 ```
 
