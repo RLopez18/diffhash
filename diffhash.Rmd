@@ -52,11 +52,6 @@ writeXStringSet(small_fasta, 'chr22_small.fa')
 # ~20x coverage ----> reads per transcript = transcriptlength/readlength * 20
 # here all transcripts will have ~equal FPKM
 readspertx = round(20 * width(small_fasta) / 100)
-# simulation call:
-simulate_experiment('chr22_small.fa', reads_per_transcript=readspertx, 
-    num_reps=c(10,10), fold_changes=fold_changes, outdir='timecourse_reads') 
-
-#------------------------------------------------------------------------------------------------------
 
 # set up transcript-by-timepoint matrix:
 num_timepoints = 12
