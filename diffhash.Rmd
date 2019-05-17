@@ -83,12 +83,6 @@ fi
 ```
 
 ## Find kmers that are differentially expressed
-
-#```{r}
-#sim_rep_info <- read.delim("simulated_reads/sim_rep_info.txt")
-#hashcounts <- read.delim("hashcounts.tsv", header=FALSE, row.names=1)
-#```
-
 ```{r}
 sim_rep_info <- read.delim("timecourse_reads/sim_rep_info.txt")
 hashcounts <- read.delim("hashcounts.tsv", header=FALSE, row.names=1)
